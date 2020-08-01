@@ -1,35 +1,35 @@
-var db = require("./db/db.json")
 var fs = require("fs");
 
 module.exports = function (app) {
 
 
     app.get("/api/notes", (req, res) => {
-        console.log("get")
         let json = getData()
         res.json(json);
     });
-    app.get("/api/notes/:id", (req, res) => {
-        let notes = getData()
-        console.log(req.params.id)
-        res.json(notes[Number(req.params.id)])
-        
-    })
 
     app.post("/api/notes", function (req, res) {
-        console.log("post")
         let json = getData()
-        let newObj = {
-            title: req.body.title,
-            text: req.body.text
-        }
-        json.push(newObj)
+        let id = json.length.toString();
+        req.body.id = id
+        json.push(req.body)
         saveData(json)
+        res.json(json);
     });
 
     app.delete("/api/notes/:id", (req, res) => {
-        let newId = req.params.id
-        console.log(req.params.id)
+        let notes = getData();
+        let noteID = req.params.id;
+        let newID = 0;
+        notes = notes.filter(currId => {
+            return currId.id != noteID;
+        })
+        for (currId of notes) {
+            currId.id = newID.toString();
+            newID++;
+        }
+        saveData(notes)
+        res.json(notes);
 
     });
 
